@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load platfom_tags %}
+{% load task_pool_tags %}
+
+
+{% block base_title %}
+    {{ web_title }}
+{% endblock base_title %}
+
+
+{% block other_css %}
+    <!-- 弹框详情css -->
+    <style type="text/css">
+        .popover-title {
+            color: #1c2b36;
+            font-weight: bolder;
+        }
+
+        .popover {
+            background-color: #1c2b36;
+            color: white;
+        }
+    </style>
+{% endblock other_css %}
+
+{% block base_content %}
+
+    <div class="app-content">
+        <div class="app-content-body fade-in-up">
+            <div class="padder" style="padding-top: 10px;">
+
+                <div class="col-md-12" style="padding-left: 0; padding-right: 0">
+                    <div class="panel panel-default" id="body-content">
+                        <div class="panel-heading">
+                            <div style="display: block; border-left: 5px solid #1c2b36; padding-left: 10px; font-size: 20px; font-weight: bolder; line-height: 25px;color: #1c2b36;">
+                                {{ web_title }}
+                            </div>
+                        </div>
+
+                        <div class="panel-body" id="table_content">
+
+                            <div class="selectBox">
+                                <a class="btn btn-sm btn-default" data-toggle="modal"
+                                   data-target="#AddInspectionListModal">
+                                    <i class="fa fa-plus"></i> EXCEL导入计划
+                                </a>
+
+
+                                <!-- 功能 -->
+
+                                <span style="font-size: 14px; padding-top: 5px;" class="pull-right">共 <b
+                                        style="color: orangered">{{ settings_nums }}</b> 条</span>
+                            </div>
+
+                            <!-- 列表 -->
+
+                            <div class="row">
+                                <div class="col-md-12" style="height:620px; overflow-y:scroll" >
+                                    <table class="table table-striped table-hover table-bordered">
+
+                                        <!-- 标题行 -->
+                                        <thead   >
+                                        <tr role="row" >
+                                            <th class="text-center" width="60">ID</th>
+                                            <th class="text-center">区域</th>
+                                            <th class="text-center">设备名称</th>
+
+                                            <th class="text-center">负责人1</th>
+                                            <th class="text-center">负责人2</th>
+
+                                            <th class="text-center">点检位置</th>
+                                            <th style="width:400px" class="text-center">作业标准</th>
+                                            <th class="text-center">作业周期</th>
+
+
+                                        </tr>
+                                        </thead>
+
+                                         <tbody   >
+                                        {% for setting in settings %}
+                                            <tr class="gradeX odd" role="row" >
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ forloop.counter }}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.0 }}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.1}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.2}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.3}}</td>
+                                                 <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.4}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.5}}</td>
+                                                 <td class="text-center"
+                                                    style="vertical-align:middle;">{{ setting.6}}</td>
+
+                                            </tr>
+                                        {% endfor %}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="panel-footer" style="padding-top: 0; padding-bottom: 0;">
+                            <div class="text-center">
+                                <ul class="pagination" style="margin-top: 10px; margin-bottom: 10px;">
+                                    <a id="SubmitBtn" class="btn btn-default btn-md active" style="margin-right: 50px" role="button">提交</a>
+                                    <a href="add" style="margin-left: 50px" class="btn btn-default btn-md active" role="button">放弃</a>
+
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock base_content %}
+
+{% block base_footer_html %}
+    <div class="modal inmodal"  id="AddInspectionListModal" tabindex="-1" role="dialog"
+         aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog" style="width: 450px;">
+            <div class="modal-content" style="margin-top: 100px;">
+
+                <div class="modal-header"
+                     style="background-color: #1c2b36; color: white;padding-top: 10px; padding-bottom: 10px;">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="icon-close" style="font-size: 18px;"></i>
+                    </button>
+                    <h4 class="modal-title">请选择EXCEL文件</h4>
+                </div>
+                <div class="form-group">
+                    <a style="text-decoration: underline;display: block;text-align:right;margin-right: 10px" href="{% static 'sample_inspection_setting.xls' %}" >查看样本</a>
+                    <form style="margin-left: 10px"  method="post" action="add" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input required type="file" name="file">
+                        <div style="display: block;text-align: center">
+                         <a class="btn btn-md btn-default" style="margin-right: 10px" data-dismiss="modal">取消</a>
+                         <input type="submit"style="margin-left: 10px"  class="btn btn-default" value="上传"/>
+                        </div>
+                     </form>
+                </div>
+                <div class="modal-footer" style="padding-right: 15px;padding-top: 10px; padding-bottom: 10px;">
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock base_footer_html %}
+
+
+{% block base_footer_js %}
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap_date/bootstrap-select.css' %}" type="text/css">
+    <script src="{% static 'plugins/bootstrap_date/bootstrap-select.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap_date/moment-with-locales.min.js' %}"></script>
+    <link href="{% static 'plugins/bootstrap_date/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+    <script src="{% static 'plugins/bootstrap_date/bootstrap-datetimepicker.min.js' %}"></script>
+
+
+    <!-- 添加记录时间选择器 -->
+    <script>
+        $('#datetimepicker_add1').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale:'zh-cn',
+        });
+
+        $('#datetimepicker_add2').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale:'zh-cn',
+        });
+    </script>
+    <script>
+            $(function () {
+                // 提交表单
+                $('#SubmitBtn').on('click', function () {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "{% url 'task_pool:add_by_excel' %}",
+                        //data: $('#id_DoneInspectionListForm{{ each_record.id }}').serialize(),
+                        async: true,
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        success: function (data) {
+                            if (data.status == 'success') {
+                                 window.alert(data.msg);
+                                window.location.reload();
+                            } else if (data.status == 'failed') {
+                                window.alert(data.msg);
+                            }
+                        }
+                    });
+                });
+            })
+        </script>
+
+
+    <!-- 下拉选择框 -->
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.selectpicker').selectpicker({
+                'selectedText': 'cat',
+                noneSelectedText: '请选择'
+            });
+        })
+    </script>
+
+    <!-- 记录详情 -->
+    <script>
+        $(function () {
+            $("[data-toggle='popover']").popover();
+        });
+    </script>
+
+
+{% endblock base_footer_js %}

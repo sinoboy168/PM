@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block base_title %}
+    设备入库
+{% endblock base_title %}
+
+
+{% block base_header_css %}
+    <!-- 弹框详情css -->
+    <style>
+        .popover-title {
+            color: #1c2b36;
+            font-weight: bolder;
+        }
+
+        .popover {
+            background-color: #1c2b36;
+            color: white;
+        }
+    </style>
+
+
+        <link href="{% static 'plugins/bootstrap_date/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+        <script src="{% static 'plugins/bootstrap_date/moment-with-locales.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap_date/bootstrap-datetimepicker.min.js' %}"></script>
+
+    <link href="{% static 'webssh_static/css/xterm.min.css' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static 'webssh_static/css/fullscreen.min.css' %}" rel="stylesheet" type="text/css"/>
+
+{% endblock base_header_css %}
+
+
+{% block base_header_js %}
+
+
+    <!-- 下拉选择框 -->
+  <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.selectpicker').selectpicker({
+             noneSelectedText:'请选择'
+            });
+        })
+
+        $(function () {
+
+            $('#datetimepicker1').datetimepicker({
+
+                format: 'YYYY-MM-DD',
+                locale:'zh-cn',
+
+            });})
+
+
+
+
+    </script>
+
+
+{% endblock base_header_js %}
+
+
+{% block base_content %}
+<!--<div style="position:relative; float:left,width:80%">-->
+<div class="app-content">
+        <div class="app-content-body fade-in-up">
+            <div class="padder" style="padding-top: 10px;">
+
+                <div class="col-md-12" style="padding-left: 0; padding-right: 0;">
+                    <div class="panel panel-default" id="body-content">
+
+                <div class="panel-heading">
+                            <div style="display: block; border-left: 5px solid #1c2b36; padding-left: 10px; font-size: 20px; font-weight: bolder; line-height: 25px;color: #1c2b36;">
+                                设备入库
+                            </div>
+                        </div>
+                <div class="selectBox">
+                    <a class="btn btn-sm btn-default" data-toggle="modal" data-target="#AddAreaModal"><i class="fa fa-plus"></i> 添加设备区域</a>
+                </div>
+                <form style="overflow-y: scroll" method="post" action="/asset/management/machine/move/in">
+                    <div class="modal-body" style="height: 500px;">
+                        <div class="col-md-6">
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">设备名称：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <input type="text" class="form-control" placeholder="设备名称"
+                                           maxlength="20" name="name" required="">
+                                </div>
+                            </div>
+
+                             <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">设备所在区域：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <select name="area" class="selectpicker form-control" title="请选择" style="display: none;">
+                                        <option value="}">请输入</option>>
+                                        {% for each_area in areas %}
+                                            <option value="{{ each_area.id }}">{{ each_area.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">供应商：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <input type="text" class="form-control" placeholder="供应商（来源）"
+                                           maxlength="20" name="supplier" required="">
+                                </div>
+                            </div>
+
+                             <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">型号：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <input type="text" class="form-control" placeholder="型号（参数）"
+                                           maxlength="20" name="type" required="">
+                                </div>
+                            </div>
+
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                    <div class="col-md-3">
+                                       <span style="font-size: 14px;">出厂日期：</span>
+                                    </div>
+                                    <div class="col-md-9" style="padding: 0;">
+                                      <div  class='input-group date' data-date-format="dd-mm-yyyy " id='datetimepicker1'>
+                                            <input required name="manufacturing_date" type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                      </div>
+                                    </div>
+                            </div>
+
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">固定资产编号：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <input type="text" name="ID_fixed_assets" class="form-control" placeholder="固定资产编号"
+                                           maxlength="20" name="ID_fixed_assets" required="">
+                                </div>
+                            </div>
+
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">状态：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+
+                                    <select required name="status" class="selectpicker form-control" style="display: none;">
+                                    <option value="">请选择</option>
+                                    <option value=0>停用</option>
+                                    <option value=1>正常</option>
+                                    <option value=2>迁出</option>
+                                    <option value=3>报废</option>
+
+
+                                 </select>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">备用：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <input type="text" class="form-control" placeholder="备用"
+                                           maxlength="20" name="network" required="">
+                                </div>
+                            </div>
+
+                             <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">操作人员：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <select name="operator" class="selectpicker form-control" style="display: none;">
+                                        {% for each_user in users %}
+                                            <option value="{{ each_user.id }}">{{ each_user.chinese_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group"
+                                 style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                                <div class="col-md-3">
+                                    <span style="font-size: 14px;">备注：</span>
+                                </div>
+                                <div class="col-md-9" style="padding: 0;">
+                                    <input type="text" class="form-control" placeholder="备注（没有可以不填）"
+                                           maxlength="200" name="desc" >
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--<div class="col-md-6">-->
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<select name="op_env" class="selectpicker form-control" style="display: none;">-->
+                                        <!--{% for each_env in envs %}-->
+                                            <!--<option value="{{ each_env.id }}">{{ each_env.name }}</option>-->
+                                        <!--{% endfor %}-->
+                                    <!--</select>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<select name="use" class="selectpicker form-control" style="display: none;">-->
+                                        <!--{% for each_use in uses %}-->
+                                            <!--<option value="{{ each_use.id }}">{{ each_use.name }}</option>-->
+                                        <!--{% endfor %}-->
+                                    <!--</select>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<select name="project" class="selectpicker form-control" style="display: none;">-->
+                                        <!--{% for each_project in projects %}-->
+                                            <!--<option value="{{ each_project.id }}">{{ each_project.name }}</option>-->
+                                        <!--{% endfor %}-->
+                                    <!--</select>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<select name="idc" class="selectpicker form-control" style="display: none;">-->
+                                        <!--{% for each_idc in idcs %}-->
+                                            <!--<option value="{{ each_idc.id }}">{{ each_idc.name }}</option>-->
+                                        <!--{% endfor %}-->
+                                    <!--</select>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<input type="text" class="form-control" placeholder="管理员账户"-->
+                                           <!--maxlength="20" name="admin_user" required="">-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<input type="text" class="form-control" placeholder="管理员密码"-->
+                                           <!--maxlength="50" name="admin_pass" required="">-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<input type="text" class="form-control" placeholder="普通用户账户（没有可以不填）"-->
+                                           <!--maxlength="20" name="normal_user" required="">-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<input type="text" class="form-control" placeholder="普通用户密码（没有可以不填）"-->
+                                           <!--maxlength="50" name="normal_pass" required="">-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<select name="op_user" class="selectpicker form-control" style="display: none;">-->
+                                        <!--{% for each_user in users %}-->
+                                            <!--<option value="{{ each_user.id }}">{{ each_user.chinese_name }}</option>-->
+                                        <!--{% endfor %}-->
+                                    <!--</select>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                            <!--<div class="form-group"-->
+                                 <!--style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<span style="font-size: 14px;">备用：</span>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-9" style="padding: 0;">-->
+                                    <!--<input type="text" class="form-control" placeholder="备注（没有可以不填）"-->
+                                           <!--maxlength="200" name="desc" required="">-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+                        <!--</div>-->
+
+                    </div>
+                     <div class="modal-footer" style="padding-right: 30px;padding-top: 10px; padding-bottom: 10px;">
+                        <input class="btn btn-sm btn-default" type='submit',value="提交"/>
+                    </div>
+                </form>
+
+                    </div>
+                    </div>
+                </div>
+            </div>
+</div>
+
+<!--</div>-->
+
+{% endblock base_content %}
+
+
+{% block base_footer_html %}
+    <div class="modal inmodal" id="AddAreaModal" tabindex="-1" role="dialog" aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog" style="width: 450px;">
+            <div class="modal-content" style="margin-top: 100px;">
+
+                <div class="modal-header" style="background-color: #1c2b36; color: white;">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="icon-close" style="font-size: 18px;"></i>
+                    </button>
+                    <h4 class="modal-title">添加区域</h4>
+                </div>
+
+                <form method="post" action="/asset/management/add/area">
+                    <div class="modal-body" style="height: 330px;">
+
+                        <div class="form-group"
+                             style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">区域名称：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                                <input type="text" class="form-control" placeholder="区域名称"
+                                       maxlength="20" name="name" required="">
+                            </div>
+                        </div>
+
+                        <div class="form-group"
+                             style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">区域状态：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+
+                                <select required name="area_status" class="selectpicker form-control" style="display: none;">
+                                    <option value="">请选择</option>
+                                    <option value=0>停用</option>
+                                    <option value=1>正常</option>
+
+                                 </select>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group"
+                             style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">描述：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                                <textarea name="desc" class="form-control" rows="3"
+                                          placeholder="备注（没有可以不填）"></textarea>
+                            </div>
+                        </div>
+
+
+                    </div>
+                <div class="modal-footer" style="padding-right: 15px;">
+                    <a class="btn btn-sm btn-default" data-dismiss="modal">取消</a>
+                    <input class="btn btn-sm btn-default" type="submit",",value="提交"/>
+                </div>
+                </form>
+
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock base_footer_html %}
+
+
+{% block base_footer_js %}
+
+    <!-- 下拉选择框 -->
+
+
+
+
+
+
+{% endblock base_footer_js %}

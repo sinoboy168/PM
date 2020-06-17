@@ -1,0 +1,685 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load platfom_tags %}
+{% load task_pool_tags %}
+
+
+{% block base_title %}
+    {{ web_title }}
+{% endblock base_title %}
+
+
+{% block other_css %}
+    <!-- 弹框详情css -->
+    <style>
+        .popover-title {
+            color: #1c2b36;
+            font-weight: bolder;
+        }
+
+        .popover {
+            background-color: #1c2b36;
+            color: white;
+        }
+    </style>
+{% endblock other_css %}
+
+{% block base_content %}
+    <!-- 右边主体 -->
+    <div class="app-content">
+        <div class="app-content-body fade-in-up">
+            <div class="padder" style="padding-top: 10px;">
+
+                <div class="col-md-10" style="padding-left: 0; padding-right: 0;">
+                    <div class="panel panel-default" id="body-content">
+                        <div class="panel-heading">
+                            <div style="display: block; border-left: 5px solid #1c2b36; padding-left: 10px; font-size: 20px; font-weight: bolder; line-height: 25px;color: #1c2b36;">
+                                {{ web_title }}{% ifnotequal keyword '' %}&nbsp;&nbsp;："{{ keyword }}"
+                                    关键字搜索结果{% endifnotequal %}
+                            </div>
+                        </div>
+
+                        <div class="panel-body" id="table_content">
+
+                            <div class="selectBox">
+                                <a class="btn btn-sm btn-default" data-toggle="modal"
+                                   data-target="#AddMaintenanceListModal">
+                                    <i class="fa fa-plus"></i> 添加临时任务
+                                </a>
+
+
+                                <!-- 功能 -->
+                                <form class="navbar-form pull-right " role="search" style="margin-top: 0;">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" name="keyword"
+                                                   class="form-control input-sm bg-light no-border rounded "
+                                                   placeholder="关键词查找记录" style="width: 150px;">
+                                            <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-sm bg-auto rounded">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </span>
+                                        </div>
+                                    </div>
+                                </form>
+                                <span style="font-size: 14px; padding-top: 5px;" class="pull-right">共 <b
+                                        style="color: orangered">{{ record_nums }}</b> 条</span>
+                            </div>
+
+                            <!-- 列表 -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-striped table-hover table-bordered">
+                                        <!-- 标题行 -->
+                                        <thead>
+                                        <tr role="row">
+                                            <th class="text-center" width="60">ID</th>
+                                            <th class="text-center">区域</th>
+                                            <th class="text-center">设备名称</th>
+                                            <th class="text-center">创建者</th>
+                                            <th class="text-center">创建时间</th>
+                                            <th class="text-center">负责人1</th>
+                                            <th class="text-center">负责人2</th>
+                                            <th class="text-center">任务状态</th>
+                                            <th class="text-center">点检位置</th>
+                                            <th class="text-center">作业标准</th>
+                                            <th class="text-center">检查结果</th>
+                                            <th class="text-center">作业周期</th>
+                                            <th class="text-center">操作</th>
+                                        </tr>
+                                        </thead>
+                                         <tbody >
+
+                                        {% for each_record in records.object_list %}
+                                            <tr class="gradeX odd" role="row">
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ forloop.counter }}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.area }}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.machine}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.creator}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.create_time}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.operator1.chinese_name}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.operator2.chinese_name}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.get_status_display}}</td>
+                                                 <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.point}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.desc}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.result}}</td>
+                                                <td class="text-center"
+                                                    style="vertical-align:middle;">{{ each_record.cycle}}</td>
+                                                <td class="text-center" style="vertical-align:middle;">
+
+                                                    {% if request.user.role > 1 %}
+                                                        <a class="btn btn-xs" data-toggle="modal"
+                                                           data-target="#DoneMaintenanceListModal{{ each_record.id }}"
+                                                           style="background-color: #009688;color: white;">
+                                                            完成
+                                                        </a>
+                                                        <a class="btn btn-xs" data-toggle="modal"
+                                                           data-target="#ChangeOperatorModal{{ each_record.id }}"
+                                                           style="background-color: #c0a16b;color: white;">
+                                                            换人
+                                                        </a>
+
+                                                    {% endif %}
+
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- 页码 -->
+                        <div class="panel-footer" style="padding-top: 0; padding-bottom: 0;">
+                            <div class="text-center">
+                                <ul class="pagination" style="margin-top: 10px; margin-bottom: 10px;">
+
+                                    <!-- 上一页 -->
+                                    {% if records.has_previous %}
+                                        <li><a href="?{{ records.previous_page_number.querystring }}">上一页<span
+                                                class="sr-only"></span></a></li>
+                                        <li><a href="?{{ records.previous_page_number.querystring }}">&laquo;<span
+                                                class="sr-only"></span></a></li>
+                                    {% endif %}
+
+                                    <!-- 页码 -->
+                                    {% for page in records.pages %}
+                                        {% if page %}
+                                            <!-- 当前页 -->
+                                            {% ifequal page records.number %}
+                                                <li class="active"><a href="?page={{ page }}">{{ page }}<span
+                                                        class="sr-only">(current)</span></a></li>
+                                                <!-- 其它页 -->
+                                            {% else %}
+                                                <li><a href="?page={{ page }}">{{ page }}<span
+                                                        class="sr-only"></span></a></li>
+                                            {% endifequal %}
+                                            <!-- 省略页 -->
+                                        {% else %}
+                                            <li><a href="">...<span class="sr-only"></span></a></li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <!-- 下一页 -->
+                                    {% if records.has_next %}
+                                        <li><a href="?{{ records.next_page_number.querystring }}">&raquo;<span
+                                                class="sr-only"></span></a></li>
+                                        <li><a href="?{{ records.next_page_number.querystring }}">下一页<span
+                                                class="sr-only"></span></a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="padding-left: 10px;padding-right: 0;">
+                    <div class="panel panel-default" id="body-content">
+                        <div class="panel-heading" style="background-color: #1c2b36; color: white;">
+                            查询导出（EXCEL）
+                        </div>
+
+                        <div class="panel-body" id="user_action_record" style="overflow-y: auto;">
+                            <form action="">
+                                <ul class="list-group no-bg no-borders pull-in">
+                                    <!-- 查询条件 -->
+                                    <li class="list-group-item" style="padding-left: 0;padding-right: 0;">
+                                        <form class="form-horizontal" method="get" style="padding-top: 0px;">
+                                            <div class="modal-body" style="padding-top: 0px;">
+
+                                                <div class="form-group" style="padding-top: 5px;">
+                                                    <label>
+                                                        <i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;开始时间
+                                                    </label>
+                                                    <div>
+                                                        <div class="input-group date" id='datetimepicker_search1'>
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </span>
+                                                            <input name="start_time" type="text" class="form-control"
+                                                                  value="{% if start_time != ''%}{{ start_time }}{% endif %}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="padding-top: 5px;">
+                                                    <label>
+                                                        <i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;结束时间
+                                                    </label>
+                                                    <div>
+                                                        <div class="input-group date"  id='datetimepicker_search2'>
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </span>
+                                                            <input name="stop_time"  type="text" class="form-control"
+                                                                   value="{% if stop_time != ''%}{{ stop_time }}{% endif %}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="padding-top: 5px;">
+                                                    <label>
+                                                        <i class="glyphicon glyphicon-tasks"></i>&nbsp;&nbsp;区域
+                                                    </label>
+                                                    <div>
+                                                        <select name="area_check"
+                                                                class="selectpicker form-control" multiple=""
+                                                                data-live-search="true" style="display: none;">
+                                                            {% for area in areas %}
+                                                                <option value="{{ area.id }}"
+                                                                        {% if area.id|Change_Str in area_list %}selected{% endif %}>{{ area.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="padding-top: 5px;">
+                                                    <label>
+                                                        <i class="glyphicon glyphicon-bookmark"></i>&nbsp;&nbsp;设备
+                                                    </label>
+                                                    <div>
+                                                        <select name="machine_check"
+                                                                class="selectpicker form-control" multiple=""
+                                                                data-live-search="true" style="display: none;">
+                                                            {% for machine in machines %}
+                                                                <option value="{{ machine.id }}"
+                                                                        {% if machine.id|Change_Str in machine_list %}selected{% endif %}>{{ machine}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="padding-top: 5px;">
+                                                    <label>
+                                                        <i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;负责人
+                                                    </label>
+                                                    <div>
+                                                        <select name="user_check"
+                                                                class="selectpicker form-control" multiple=""
+                                                                data-live-search="true" style="display: none;">
+                                                            {% for user in users %}
+                                                                <option value="{{ user.id }}"
+                                                                        {% if user.id|Change_Str in user_list %}selected{% endif %}>{{ user.chinese_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="padding-top: 5px;">
+                                                    <label>
+                                                        <i class="glyphicon glyphicon-info-sign"></i>&nbsp;&nbsp;状态
+                                                    </label>
+                                                    <div>
+                                                        <select name="status_check" multiple=""
+                                                                class="selectpicker form-control"
+                                                                style="display: none;">
+                                                            <option value="done"
+                                                                    {% if "done" in status_list %}selected{% endif %} >
+                                                                已处理
+                                                            </option>
+                                                            <option value="pending"
+                                                                    {% if "pending" in status_list %}selected{% endif %}>
+                                                                未处理
+                                                            </option>
+                                                            <option value="other"
+                                                                    {% if "other" in status_list %}selected{% endif %}>
+                                                                其它
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <button type="submit"
+                                                            formaction="{% url 'task_pool:Maintenance_list' %}"
+                                                            class="btn btn-sm btn-block" name="action" value="search"
+                                                            style="background-color: #009688;color: white;">搜索记录
+                                                    </button>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <button type="submit"
+                                                            formaction="{% url 'task_pool:Maintenance_list' %}"
+                                                            name="action" class="btn btn-sm btn-block"
+                                                            value="export_search"
+                                                            style="background-color: #009688;color: white;">条件导出
+                                                    </button>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <button type="submit"
+                                                            formaction="{% url 'task_pool:Maintenance_list' %}"
+                                                            name="action" class="btn btn-sm btn-block"
+                                                            value="export_all"
+                                                            style="background-color: #009688;color: white;">
+                                                        全部导出
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock base_content %}
+
+{% block base_footer_html %}
+    <div class="modal inmodal" id="AddMaintenanceListModal" tabindex="-1" role="dialog"
+         aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog" style="width: 450px;">
+            <div class="modal-content" style="margin-top: 100px;">
+
+                <div class="modal-header"
+                     style="background-color: #1c2b36; color: white;padding-top: 10px; padding-bottom: 10px;">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="icon-close" style="font-size: 18px;"></i>
+                    </button>
+                    <h4 class="modal-title">添加任务清单</h4>
+                </div>
+
+                <form method="post" id="id_AddMaintenanceListForm">
+                    <div class="modal-body" style="height: 520px;">
+
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">设备区域：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                                <select name="area" class="selectpicker form-control" data-live-search="true"
+                                        style="display: none;">
+                                    {% for area in areas %}
+                                        <option value="{{ area.id }}">{{area}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">设备名称</span>
+                            </div>
+                             <div class="col-md-9" style="padding: 0;">
+                                <select name="machine" class="selectpicker form-control" data-live-search="true"
+                                        style="display: none;">
+                                    {% for machine in machines %}
+                                        <option value="{{ machine.id }}">{{ machine}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                        </div>
+
+
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">责任人1</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                               <select name="operator1" class="selectpicker form-control"
+                                        data-live-search="true"
+                                        style="display: none;">
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.chinese_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">责任人2</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                               <select name="operator2" class="selectpicker form-control"
+                                        data-live-search="true"
+                                        style="display: none;">
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.chinese_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">点检位置：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                            <input type="text" class="form-control" placeholder="点检位置" maxlength="20"
+                                       name="point"
+                                       required="">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">作业标准：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+
+                                <textarea class ="form-control"  name="desc" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+                <div class="modal-footer" style="padding-right: 15px;padding-top: 10px; padding-bottom: 10px;">
+                    <a class="btn btn-sm btn-default" data-dismiss="modal">取消</a>
+                    <a class="btn btn-sm btn-default" id="id_AddMaintenanceListBtn">添加</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            // 提交表单
+            $('#id_AddMaintenanceListBtn').on('click', function () {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "{% url 'task_pool:add_maintenance' %}",
+                    data: $('#id_AddMaintenanceListForm').serialize(),
+                    async: true,
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            window.location.reload();
+                        } else if (data.status == 'failed') {
+                            window.alert(data.msg);
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+
+
+
+
+    {% for each_record in records.object_list %}
+        <!-- 完成点检任务 -->
+        <div class="modal inmodal" id="DoneMaintenanceListModal{{ each_record.id }}" tabindex="-1" role="dialog"
+             aria-hidden="true"
+             data-backdrop="static">
+            <div class="modal-dialog" style="width: 450px;">
+                <div class="modal-content" style="margin-top: 100px;">
+
+                    <div class="modal-header"
+                         style="background-color: #1c2b36; color: white;padding-top: 10px; padding-bottom: 10px;">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <i class="icon-close" style="font-size: 18px;"></i>
+                        </button>
+                        <h4 class="modal-title">完成任务</h4>
+                    </div>
+
+                    <form method="post" id="id_DoneMaintenanceListForm{{ each_record.id }}">
+                        <input type="hidden" name="record_id" value="{{ each_record.id }}">
+                        <div class="modal-body">
+                            <span style="font-size: 16px;color: black;">是否确定完成该记录？</span>
+                        </div>
+                       <div class="modal-footer" style="padding-right: 15px;padding-top: 10px; padding-bottom: 10px;">
+                        <a class="btn btn-sm btn-default" data-dismiss="modal">取消</a>
+                        <a class="btn btn-sm btn-default" id="id_DoneMaintenanceListBtn{{ each_record.id }}">确定</a>
+                    </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(function () {
+                // 提交表单
+                $('#id_DoneMaintenanceListBtn{{each_record.id }}').on('click', function () {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "{% url 'task_pool:Done_Maintenance' %}",
+                        data: $('#id_DoneMaintenanceListForm{{ each_record.id }}').serialize(),
+                        async: true,
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        success: function (data) {
+                            if (data.status == 'success') {
+                                window.location.reload();
+                            } else if (data.status == 'failed') {
+                                window.alert(data.msg);
+                            }
+                        }
+                    });
+                });
+            })
+        </script>
+
+        <!-- 更换责任人 -->
+        <div class="modal inmodal" id="ChangeOperatorModal{{ each_record.id }}" tabindex="-1" role="dialog"
+             aria-hidden="true"
+             data-backdrop="static">
+            <div class="modal-dialog " style="padding-top: 10%;width: 450px;">
+                <div class="modal-content">
+
+                    <div class="modal-header"
+                         style="background-color: #1c2b36; color: white;padding-top: 10px; padding-bottom: 10px;">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <i class="icon-close" style="font-size: 18px;"></i>
+                        </button>
+                        <h4 class="modal-title">变更责任人</h4>
+                    </div>
+
+                    <form method="post" id="id_ChangeOperatorForm{{ each_record.id }}">
+                        <input type="hidden" name="record_id" value="{{ each_record.id }}">
+                        <div class="modal-body">
+                            <span style="font-size: 16px;color: black;">是否确定变更责任人？</span>
+                        </div>
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">责任人1：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                                <select name="operator1" class="selectpicker form-control"
+                                        data-live-search="true"
+                                        style="display: none;">
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.chinese_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="vertical-align: middle;line-height: 34px;padding-bottom: 30px;">
+                            <div class="col-md-3">
+                                <span style="font-size: 14px;">责任人2：</span>
+                            </div>
+                            <div class="col-md-9" style="padding: 0;">
+                                <select name="operator2" class="selectpicker form-control"
+                                        data-live-search="true"
+                                        style="display: none;">
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.chinese_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="modal-footer" style="padding: 10px;padding-top: 10px; padding-bottom: 10px;">
+                        <a class="btn btn-default" data-dismiss="modal" style="padding: 2px 10px;">取消</a>
+                        <a class="btn btn-default" id="id_ChangeOperatorBtn{{ each_record.id }}"
+                           style="padding: 2px 10px;">确定</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 更换责任人 -->
+        <script>
+            $(function () {
+                // 提交表单
+                $('#id_ChangeOperatorBtn{{ each_record.id }}').on('click', function () {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "{% url 'task_pool:change_operator' %}",
+                        data: $('#id_ChangeOperatorForm{{ each_record.id }}').serialize(),
+                        async: true,
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        success: function (data) {
+                            if (data.status == 'success') {
+                                window.location.reload();
+                            } else if (data.status == 'failed') {
+                                window.alert(data.msg);
+                            }
+                        }
+                    });
+                });
+            })
+        </script>
+    {% endfor %}
+{% endblock base_footer_html %}
+
+
+{% block base_footer_js %}
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap_date/bootstrap-select.css' %}" type="text/css">
+    <script src="{% static 'plugins/bootstrap_date/bootstrap-select.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap_date/moment-with-locales.min.js' %}"></script>
+    <link href="{% static 'plugins/bootstrap_date/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+    <script src="{% static 'plugins/bootstrap_date/bootstrap-datetimepicker.min.js' %}"></script>
+
+    <!-- 搜索记录时间选择器 -->
+    <script>
+        $('#datetimepicker_search1').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale:'zh-cn',
+
+        });
+
+        $('#datetimepicker_search2').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+
+            locale:'zh-cn',
+
+        });
+    </script>
+
+    <!-- 添加记录时间选择器 -->
+    <script>
+        $('#datetimepicker_add1').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale:'zh-cn',
+        });
+
+        $('#datetimepicker_add2').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale:'zh-cn',
+        });
+    </script>
+
+    <!-- 下拉选择框 -->
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.selectpicker').selectpicker({
+                'selectedText': 'cat',
+                noneSelectedText: '请选择'
+            });
+        })
+    </script>
+
+    <!-- 记录详情 -->
+    <script>
+        $(function () {
+            $("[data-toggle='popover']").popover();
+        });
+    </script>
+
+
+{% endblock base_footer_js %}
