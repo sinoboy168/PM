@@ -1,2 +1,2 @@
-*.js linguist-language=Django
-*.html linguist-language=Django
+*.h linguist-language=Django
+*.m linguist-language=Django
